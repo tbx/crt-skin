@@ -2,6 +2,8 @@
 
 Two files that turn any website into a picture on an old tube TV. Scanlines, snow, hum bars, colour fringes, a channel button. No build step, no framework, nothing loaded from outside.
 
+[![The demo page with the skin on: SMPTE colour bars behind a pixel font headline, scanlines and snow over everything, a green CH1 top right](screenshot.png)](https://tbx.github.io/crt-skin/demo/)
+
 Demo: https://tbx.github.io/crt-skin/demo/
 
 The look follows [GOROman's Famicom RF decoder](https://github.com/GOROman/famicom-rf-hackrf-decoder): a page received over the antenna, not rendered on a display.
