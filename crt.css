@@ -103,10 +103,9 @@ html[data-skin="crt"]:not(#_) {
 	[data-crt="marker"] { font-family: var(--crt-font-px); font-weight: 400; font-size: 14px; line-height: 1.6; color: var(--crt-lime); letter-spacing: 0; }
 	[data-crt="muted"] { color: var(--crt-muted); }
 
-	/* Linien im Logo-Grün, Flächen dunkel. */
+	/* Flächen dunkel. hr, wo die Seite eine setzt, als dicke grüne Linie. */
 	hr { border: 0; border-top: 3px solid var(--crt-green); margin: 2rem 0; }
-	header, nav, footer { background: var(--crt-bg); color: var(--crt-fg); backdrop-filter: none; -webkit-backdrop-filter: none; border-color: var(--crt-green); }
-	footer { border-top: 3px solid var(--crt-green); }
+	header, nav, footer { background: var(--crt-bg); color: var(--crt-fg); backdrop-filter: none; -webkit-backdrop-filter: none; }
 
 	/* Links und Knöpfe. Links Lime, Knöpfe mit dickem Rahmen und ohne Rundung, beim Zeigen invertiert. */
 	a { color: var(--crt-lime); }

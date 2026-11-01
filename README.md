@@ -4,7 +4,7 @@ Two files that turn any website into a picture on an old tube TV. Scanlines, sno
 
 Demo: https://tbx.github.io/crt-skin/demo/
 
-The look follows GOROman's Famicom RF decoder: a page received over the antenna, not rendered on a display.
+The look follows [GOROman's Famicom RF decoder](https://github.com/GOROman/famicom-rf-hackrf-decoder): a page received over the antenna, not rendered on a display.
 
 ## Install
 
