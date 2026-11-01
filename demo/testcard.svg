@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <!-- Testbild, kein Foto: die Demo lädt nichts von außen. -->
+  <rect width="1600" height="900" fill="#111"/>
+  <g>
+    <rect x="0" y="0" width="200" height="620" fill="#c0c0c0"/>
+    <rect x="200" y="0" width="200" height="620" fill="#c0c000"/>
+    <rect x="400" y="0" width="200" height="620" fill="#00c0c0"/>
+    <rect x="600" y="0" width="200" height="620" fill="#00c000"/>
+    <rect x="800" y="0" width="200" height="620" fill="#c000c0"/>
+    <rect x="1000" y="0" width="200" height="620" fill="#c00000"/>
+    <rect x="1200" y="0" width="200" height="620" fill="#0000c0"/>
+    <rect x="1400" y="0" width="200" height="620" fill="#131313"/>
+  </g>
+  <g>
+    <rect x="0" y="620" width="200" height="80" fill="#0000c0"/>
+    <rect x="200" y="620" width="200" height="80" fill="#131313"/>
+    <rect x="400" y="620" width="200" height="80" fill="#c000c0"/>
+    <rect x="600" y="620" width="200" height="80" fill="#131313"/>
+    <rect x="800" y="620" width="200" height="80" fill="#00c0c0"/>
+    <rect x="1000" y="620" width="200" height="80" fill="#131313"/>
+    <rect x="1200" y="620" width="200" height="80" fill="#c0c0c0"/>
+    <rect x="1400" y="620" width="200" height="80" fill="#131313"/>
+  </g>
+  <g>
+    <rect x="0" y="700" width="250" height="200" fill="#00214c"/>
+    <rect x="250" y="700" width="250" height="200" fill="#fff"/>
+    <rect x="500" y="700" width="250" height="200" fill="#32006a"/>
+    <rect x="750" y="700" width="450" height="200" fill="#131313"/>
+    <rect x="1200" y="700" width="70" height="200" fill="#090909"/>
+    <rect x="1270" y="700" width="70" height="200" fill="#131313"/>
+    <rect x="1340" y="700" width="70" height="200" fill="#1d1d1d"/>
+    <rect x="1410" y="700" width="190" height="200" fill="#131313"/>
+  </g>
+  <circle cx="800" cy="400" r="300" fill="none" stroke="#fff" stroke-width="14"/>
+  <circle cx="800" cy="400" r="300" fill="rgba(0,0,0,.55)"/>
+  <text x="800" y="420" text-anchor="middle" font-family="monospace" font-size="96" font-weight="700" fill="#fff" letter-spacing="8">CRT</text>
+  <text x="800" y="500" text-anchor="middle" font-family="monospace" font-size="40" fill="#39ff14" letter-spacing="6">NO SIGNAL</text>
+</svg>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en" data-skin="crt">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<title>crt-skin: your website on a tube TV</title>
+	<meta name="description" content="Two files that turn any website into a picture on an old tube TV. Scanlines, snow, hum bars, colour fringes, a channel button. No build step, no framework, no external requests.">
+	<meta name="theme-color" content="#050507">
+	<link rel="stylesheet" href="demo.css">
+	<!-- Das Skin: zwei Dateien. crt.js im head ohne defer, damit das Attribut vor dem ersten Paint steht. -->
+	<link rel="stylesheet" href="../crt.css">
+	<script src="../crt.js" data-ch3="testcard.svg" data-ch3-label="Channel 3: test card"></script>
+</head>
+<body>
+	<header>
+		<nav class="wrap">
+			<a class="brand" href="#top">crt-skin</a>
+			<a href="#install">Install</a>
+			<a href="#states">States</a>
+			<a href="https://github.com/tbx/crt-skin">GitHub</a>
+			<button type="button" id="toggle" aria-pressed="true">Skin: on</button>
+		</nav>
+	</header>
+
+	<main id="top">
+		<section class="hero" data-crt="hero">
+			<img src="testcard.svg" alt="" width="1600" height="900">
+			<div class="wrap">
+				<h1>Your website, as seen on a tube TV from 1987.</h1>
+				<p class="lede">Two files. Scanlines, snow, hum bars, colour fringes and a channel button. No build step, no framework, nothing loaded from outside.</p>
+				<p><a href="#install" data-crt="button">Get the two files</a></p>
+			</div>
+		</section>
+
+		<section id="install" class="wrap">
+			<h2>Install</h2>
+			<p>Put <code>crt.css</code>, <code>crt.js</code> and the <code>fonts/</code> folder next to each other. Then add two lines to your page and the attribute to <code>html</code>.</p>
+			<div class="code">
+				<pre><code id="snippet">&lt;html data-skin="crt"&gt;
+  &lt;link rel="stylesheet" href="crt.css"&gt;
+  &lt;script src="crt.js"&gt;&lt;/script&gt;</code></pre>
+				<button type="button" id="copy">Copy</button>
+			</div>
+			<p>Leave the attribute out and the skin stays off until someone opens your page with <code>?skin=crt</code>. The choice is remembered, <code>?skin=off</code> clears it. Press the pulsing <strong>CH1</strong> top right, or the arrow keys.</p>
+		</section>
+
+		<section id="states" class="wrap">
+			<h2>What it does</h2>
+			<ul class="states">
+				<li><span data-crt="marker">A</span><div><h3>Power on</h3><p>The picture comes in disturbed: snow, hum bar, the content waves. After three seconds it settles. Headings snap into focus as they enter the screen.</p></div></li>
+				<li><span data-crt="marker">B</span><div><h3>Reception</h3><p>Leave the page alone for ten seconds and the signal drifts for four. Any touch, key or scroll brings it back. While you scroll, the colour fringes on the headings widen.</p></div></li>
+				<li><span data-crt="marker">C</span><div><h3>Channels</h3><p>CH1 is your page. CH2 is static, every click returns. CH3 shows an image or video of your choice, off unless you set one. Keys 1 to 3 and the arrow keys switch too.</p></div></li>
+				<li><span data-crt="marker">D</span><div><h3>Weak hardware</h3><p>Reduced motion, data saver, little memory or a frame test under 45 fps switch to a lite mode: scanlines and vignette stay, nothing animates, text stays sharp.</p></div></li>
+			</ul>
+		</section>
+
+		<section class="wrap two">
+			<figure data-crt="photo">
+				<img src="testcard.svg" alt="Test card" width="1600" height="900">
+			</figure>
+			<div>
+				<blockquote data-crt="title">Nothing is loaded from outside. The font ships with the files.</blockquote>
+				<p data-crt="muted">Press Start 2P for h1, h2 and anything you mark as a title. Everything else keeps the font of your site.</p>
+			</div>
+		</section>
+
+		<section id="hooks" class="wrap">
+			<h2>Hooks</h2>
+			<p>The skin works on plain elements. A few optional attributes give it more to work with:</p>
+			<table>
+				<tr><td><code>data-crt="hero"</code></td><td>A section with a photo: saturated like NTSC chroma, darkened from below.</td></tr>
+				<tr><td><code>data-crt="photo"</code></td><td>A figure with a frame and colour fringe.</td></tr>
+				<tr><td><code>data-crt="title"</code></td><td>Any element in the heading style, for example a quote.</td></tr>
+				<tr><td><code>data-crt="marker"</code></td><td>Small pixel labels like A, B, C.</td></tr>
+				<tr><td><code>data-crt="button"</code></td><td>A link that looks like a button.</td></tr>
+			</table>
+		</section>
+
+		<section id="form" class="wrap">
+			<h2>Forms look like this</h2>
+			<form onsubmit="return false">
+				<p><label for="name">Name</label><input id="name" type="text" placeholder="Your name"></p>
+				<p><label for="msg">Message</label><textarea id="msg" rows="3" placeholder="Try typing here, the picture steadies."></textarea></p>
+				<p><button type="submit">Send</button></p>
+			</form>
+		</section>
+	</main>
+
+	<footer class="wrap">
+		<p>MIT License. Press Start 2P by CodeMan38, SIL Open Font License. Made by <a href="https://x.com/tbx">@tbx</a>, inspired by GOROman's Famicom RF decoder.</p>
+	</footer>
+
+	<script>
+		/* Demo: Umschalter und Kopierknopf. Beides nutzt nur die öffentliche Schnittstelle von crt.js. */
+		(function () {
+			var toggle = document.getElementById('toggle');
+			var paint = function () {
+				var on = window.crtSkin.isOn();
+				toggle.textContent = 'Skin: ' + (on ? 'on' : 'off');
+				toggle.setAttribute('aria-pressed', String(on));
+			};
+			toggle.addEventListener('click', function () { window.crtSkin.toggle(); paint(); });
+			paint();
+
+			var copy = document.getElementById('copy');
+			copy.addEventListener('click', function () {
+				var text = document.getElementById('snippet').textContent;
+				var done = function () { copy.textContent = 'Copied'; setTimeout(function () { copy.textContent = 'Copy'; }, 1500); };
+				if (navigator.clipboard) navigator.clipboard.writeText(text).then(done);
+			});
+		})();
+	</script>
+</body>
+</html>

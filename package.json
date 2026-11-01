@@ -1,0 +1,16 @@
+{
+  "name": "crt-skin",
+  "version": "0.1.0",
+  "description": "Two files that turn any website into a picture on an old tube TV: scanlines, snow, hum bars, colour fringes, channel switch.",
+  "license": "MIT",
+  "author": "tbx (https://x.com/tbx)",
+  "repository": "github:tbx/crt-skin",
+  "files": ["crt.css", "crt.js", "fonts"],
+  "scripts": {
+    "build": "esbuild src/crt.ts --bundle --format=iife --target=es2018 --outfile=crt.js --legal-comments=inline",
+    "demo": "python3 -m http.server 8765"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
