@@ -1,6 +1,6 @@
 # crt-skin
 
-Two files that turn any website into a picture on an old tube TV. Scanlines, snow, hum bars, colour fringes, a channel button. No build step, no framework, nothing loaded from outside.
+Turn any website into a picture on an old tube TV. Scanlines, snow, hum bars, colour fringes, a channel button. No build step, no framework, nothing loaded from outside.
 
 [![The demo page with the skin on: SMPTE colour bars behind a pixel font headline, scanlines and snow over everything, a green CH1 top right](screenshot.png)](https://tbx.github.io/crt-skin/demo/)
 
