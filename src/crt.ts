@@ -19,11 +19,14 @@
    ist oder gescrollt wird. Steht ein Titel im Bild und ist Ruhe, bekommt er .crt-sharp und wird
    scharf (Übergang in crt.css). data-crt-scrolling liegt auf html, solange gescrollt wird.
 
-   Kanäle: CH1 ist die Seite, CH2 nur Rauschen, CH3 ein eigenes Bild oder Video. Das Skript baut
-   Kanalknopf, Flackern und Kanal 3 selbst in den body. CH3 gibt es nur, wenn das Skript-Tag
-   data-ch3="bild.gif" oder data-ch3="film.mp4" trägt; die Adresse wird erst beim ersten Umschalten
-   geladen. Auf CH2 und CH3 geht jeder Klick außerhalb des Knopfs zurück auf CH1, CH2 nach 10 s auch
-   von allein. Pfeiltasten und Zifferntasten schalten ebenfalls.
+   Kanäle: CH1 ist die Seite, CH2 nur Rauschen, CH3 ein eigenes Bild oder Video, der letzte Kanal
+   die Seite mit sauberem Empfang (keine Artefakte, keine Einschaltstörung, nur die Störung nach der
+   Ruhe). Das Skript baut Schirm, Kanalknopf und Kanal 3 selbst in den body. CH3 gibt es nur, wenn
+   das Skript-Tag data-ch3="bild.gif" oder data-ch3="film.mp4" trägt; die Adresse wird erst beim
+   ersten Umschalten geladen. Ohne CH3 ist der saubere Kanal CH3, sonst CH4. html trägt auf den
+   anderen Kanälen data-crt-ch="static", "media" oder "clean". Auf Rauschen und Bild geht jeder
+   Klick außerhalb des Knopfs zurück auf CH1, Rauschen nach 10 s auch von allein. Pfeiltasten und
+   Zifferntasten schalten ebenfalls.
 
    Attribute am Skript-Tag:
      data-ch3        Adresse für Kanal 3 (gif, jpg, png, webp, mp4, webm). Ohne: nur CH1 und CH2.
@@ -102,18 +105,28 @@ const build = () => {
 	if (built) return;
 	built = true;
 
-	/* Bedienung: Flackern, Kanalknopf, Kanal 3. Ohne Skin per CSS ausgeblendet. */
+	/* Bedienung: Schirm (Wölbung, Schnee, Brummstreifen, Flackern), Kanalknopf, Kanal 3. Ohne Skin per CSS ausgeblendet.
+	   Der Schirm ist eine absolute, dokumentgroße Ebene mit einem Bildschirm, der am Viewport klebt (crt.css):
+	   iOS Safari beschneidet feste Ebenen an Statusleiste und Safari-Leiste, so nicht. */
 	const ui = document.createElement('div');
 	ui.className = 'crt-ui';
+	const screenLayer = document.createElement('div');
+	screenLayer.className = 'crt-screen';
+	screenLayer.setAttribute('aria-hidden', 'true');
+	const view = document.createElement('div');
+	view.className = 'crt-screen-view';
+	const hum = document.createElement('div');
+	hum.className = 'crt-hum';
 	const flick = document.createElement('div');
 	flick.className = 'crt-flick';
-	flick.setAttribute('aria-hidden', 'true');
+	view.append(hum, flick);
+	screenLayer.append(view);
 	const chBtn = document.createElement('button');
 	chBtn.className = 'crt-ch';
 	chBtn.type = 'button';
 	chBtn.setAttribute('aria-label', cfg.label);
 	chBtn.textContent = 'CH1';
-	ui.append(flick, chBtn);
+	ui.append(screenLayer, chBtn);
 	let tv: HTMLElement | null = null;
 	let media: HTMLImageElement | HTMLVideoElement | null = null;
 	if (cfg.ch3) {
@@ -139,7 +152,11 @@ const build = () => {
 		ui.append(tv);
 	}
 	document.body.append(ui);
-	const channels = tv ? 3 : 2;
+	/* Kanalliste: Seite, Rauschen, Bild (wenn gesetzt), sauber. Der Wert steht als data-crt-ch auf html. */
+	const kinds: string[] = ['page', 'static', ...(tv ? ['media'] : []), 'clean'];
+	const channels = kinds.length;
+	/* Sender mit Bild: dort bleibt ein Klick ein Klick. */
+	const isPage = (n: number) => kinds[n - 1] === 'page' || kinds[n - 1] === 'clean';
 
 	/* ---------- Störung ---------- */
 	/* Nach 10 s Ruhe stört es für 4 s, dann steht das Bild wieder, und der Zähler läuft von vorn. Jede Berührung beendet die Störung sofort. */
@@ -152,7 +169,10 @@ const build = () => {
 	};
 	const activity = () => { if (!isOn()) return; setStable(true); armIdle(); };
 	/* Einschalten: erst gestört, nach 3 s steht das Bild. Beim Laden und bei jeder Rückkehr auf CH1. */
+	let clean = () => {};
 	powerOn = () => { setStable(false); clearTimeout(idle); clearTimeout(calm); clearTimeout(warm); warm = window.setTimeout(activity, STABLE_AFTER); };
+	/* Sauberer Kanal: steht sofort, nur der Zähler für die Störung nach der Ruhe läuft. */
+	clean = () => { clearTimeout(warm); activity(); };
 	let lastMove = 0;
 	const onMove = () => { const t = Date.now(); if (t - lastMove > 400) { lastMove = t; activity(); } };
 	['pointerdown', 'touchstart', 'keydown', 'wheel'].forEach((e) => addEventListener(e, activity, { passive: true, capture: true }));
@@ -198,11 +218,12 @@ const build = () => {
 		clearTimeout(back);
 		const from = ch;
 		ch = n;
-		if (n === 1) html.removeAttribute('data-crt-ch'); else html.setAttribute('data-crt-ch', String(n));
+		const kind = kinds[n - 1];
+		if (kind === 'page') html.removeAttribute('data-crt-ch'); else html.setAttribute('data-crt-ch', kind);
 		chBtn.textContent = 'CH' + n;
-		if (n === 2) back = window.setTimeout(() => setCh(1), 10000);
+		if (kind === 'static') back = window.setTimeout(() => setCh(1), 10000);
 		if (tv && media) {
-			if (n === 3) {
+			if (kind === 'media') {
 				if (!media.getAttribute('src')) media.src = cfg.ch3;
 				tv.hidden = false;
 				if (media instanceof HTMLVideoElement) media.play().catch(() => {});
@@ -211,8 +232,9 @@ const build = () => {
 				if (media instanceof HTMLVideoElement) media.pause();
 			}
 		}
-		/* Zurück auf CH1: der Sender kommt wie beim ersten Besuch erst nach kurzer Störung rein. */
-		if (n === 1 && from !== 1) powerOn();
+		/* Zurück auf CH1: der Sender kommt wie beim ersten Besuch erst nach kurzer Störung rein. Der saubere Kanal steht sofort. */
+		if (kind === 'page' && from !== 1) powerOn();
+		else if (kind === 'clean') clean();
 	};
 	const next = () => setCh(ch === channels ? 1 : ch + 1);
 	const prev = () => setCh(ch === 1 ? channels : ch - 1);
@@ -227,7 +249,7 @@ const build = () => {
 		else if (e.key === 'ArrowLeft') prev();
 	});
 	document.addEventListener('click', (e) => {
-		if (ch === 1 || e.target === chBtn) return;
+		if (isPage(ch) || e.target === chBtn) return;
 		e.preventDefault(); e.stopPropagation();
 		setCh(1);
 	}, true);

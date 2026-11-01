@@ -7,28 +7,33 @@
    An ist das Skin, sobald html das Attribut data-skin="crt" trägt. crt.js setzt es
    bei ?skin=crt (merkt sich die Wahl in localStorage) und nimmt es bei ?skin=off weg.
 
+   Diese Datei ist nur das Signal: der Fernseher über der Seite. Die Seite darunter bleibt die
+   Seite, mit ihren Schriften, Größen, Farben, Knöpfen und Linien. Das Skin macht sie dunkel
+   (ein Schirm ist dunkel), legt Scanlines, Lochmaske, Wölbung, Schnee, Brummstreifen und
+   Flackern darüber, gibt Titeln Farbsäume, Fotos NTSC-Sättigung und setzt den Kanalknopf.
+   Wer dazu den Gerätelook will (Pixelschrift für Titel, Lime-Links, dicke Rahmen, schwarze
+   Formularfelder), bindet zusätzlich crt-look.css ein.
+
    Alles hier gilt nur unter html[data-skin="crt"]. Das :not(#_) am Wurzelselektor hebt jede
    Regel auf ID-Spezifität, damit das Skin die Styles der Seite schlägt, ohne !important.
    Overlays liegen über dem Inhalt und lassen Klicks durch.
 
-   Das Skin arbeitet mit Elementen (h1, h2, h3, p, a, nav, header, footer, main, img, input,
-   textarea, select, button, hr, pre). Dazu wenige Haken, die man ins eigene HTML setzen kann:
-   - data-crt="title"   Element im Titelstil (Pixelschrift, rastet ein), etwa ein Zitat
+   Haken, die man ins eigene HTML setzen kann:
+   - data-crt="title"   Element, das wie ein Titel einrastet (Farbsäume), etwa ein Zitat
    - data-crt="hero"    Bildfläche mit Foto: gesättigt wie NTSC-Chroma, dunkler Verlauf, Scanlines
-   - data-crt="photo"   Foto mit Rahmen und Farbsaum
-   - data-crt="marker"  kleine Marke in Pixelschrift (A, B, C, 01, 02)
-   - data-crt="button"  Link, der wie ein Knopf aussieht
-   - data-crt="muted"   gedämpfter Text
+   - data-crt="photo"   Foto mit zweiter Lage Scanlines und Farbsaum
 
    Zustände auf html, alle aus crt.js:
    - data-crt="stable"      das Bild steht. Ohne das Attribut ist es gestört (Schnee, Brummstreifen,
-                            Wellen auf main): beim Einschalten für 3 s und nach 10 s ohne Berührung.
+                            Wellen auf main): beim Einschalten für 3 s und nach 10 s ohne Berührung für 4 s.
    - data-crt-scrolling     liegt an, solange gescrollt wird (mehr Schnee, Farbsäume an Titeln).
-   - data-crt-ch="2"        Kanal 2, nur Rauschen. Jeder Klick und nach 10 s automatisch zurück.
-   - data-crt-ch="3"        Kanal 3, eigenes Bild oder Video (data-ch3 am Skript). Jeder Klick zurück.
+   - data-crt-ch="static"   Rauschen, kein Sender. Jeder Klick und nach 10 s automatisch zurück.
+   - data-crt-ch="media"    eigenes Bild oder Video (data-ch3 am Skript). Jeder Klick zurück.
+   - data-crt-ch="clean"    sauberer Empfang: steht das Bild, ist nichts vom Fernseher zu sehen.
+                            Keine Einschaltstörung, nur die Störung nach der Ruhe.
    - data-crt-lite          schwache Hardware: keine laufenden Animationen, Scanlines und Vignette bleiben.
 
-   Die Wellen laufen auf main. Nicht auf body: ein transform auf body würde die festen Ebenen
+   Die Wellen laufen auf main. Nicht auf body: ein transform auf body würde die Ebenen
    mitnehmen. Seiten ohne main bekommen keine Wellen, alles andere läuft trotzdem.
 
    Anpassen über Custom Properties auf html[data-skin="crt"], zum Beispiel die Lage des Kanalknopfs:
@@ -52,14 +57,10 @@
 }
 
 html[data-skin="crt"]:not(#_) {
-	/* Tokens: nur dunkel, NES-Palette. Lime ist die Gerätefarbe (Kanalknopf, Marker, Links, Formular, Fokus). */
-	--crt-bg: #050507;
-	--crt-fg: #ececec;
-	--crt-muted: #c6c6c6;
-	--crt-line: #3a3a3a;
-	--crt-green: #12923a;
+	/* Tokens. Lime ist die Gerätefarbe (Kanalknopf). Hat die Seite einen eigenen Dark Mode, kann sie --crt-bg und --crt-fg darauf setzen. */
+	--crt-bg: #101010;
+	--crt-fg: #f3f1ee;
 	--crt-lime: #39ff14;
-	--crt-danger: #ff5a4e;
 	--crt-font-px: "Press Start 2P", monospace;
 	--crt-glow: 0 0 6px rgba(57, 255, 20, .8), 0 0 18px rgba(57, 255, 20, .4);
 	--crt-ch-top: 36px;
@@ -72,104 +73,68 @@ html[data-skin="crt"]:not(#_) {
 	color: var(--crt-fg);
 
 	/* overflow-x clip: die Wellen verschieben den Inhalt um ein paar Pixel, das darf keinen Scrollbalken erzeugen.
+	   touch-action manipulation: kein Doppeltipp-Zoom, zwei schnelle Tipps auf den Kanalknopf hatten die Seite auf iOS herangezoomt. Pinch bleibt.
 	   Lesetext mit einem feinen Phosphor-Schimmer und einem Hauch Farbsaum: lesbar, aber nicht wie ein Display von heute.
 	   Vererbt auf alles, Titel überschreiben das mit ihrem eigenen Saum. */
-	body { background: var(--crt-bg); color: var(--crt-fg); overflow-x: clip; text-shadow: 0 0 1.5px rgba(236, 236, 236, .35), -0.5px 0 rgba(255, 40, 40, .22), 0.5px 0 rgba(40, 230, 255, .22); }
-	::selection { background: var(--crt-lime); color: #000; text-shadow: none; }
+	body { background: var(--crt-bg); color: var(--crt-fg); overflow-x: clip; touch-action: manipulation; text-shadow: 0 0 1.5px rgba(243, 241, 238, .35), -0.5px 0 rgba(255, 40, 40, .22), 0.5px 0 rgba(40, 230, 255, .22); }
 
-	/* Zwei Stimmen: Press Start 2P ist das Gerät (h1, h2, Titel-Haken, Kanalknopf, Marker), die Schrift der Seite ist das Programm.
-	   Press Start 2P ist ein 8-px-Raster, deshalb feste Größen statt clamp(): krumme Werte machen die Pixel ungleich.
-	   Monospaced: das Leerzeichen ist eine volle Zelle, deshalb der engere Wortabstand. h1 Lime, alle anderen Titel weiß. */
-	h1, h2, [data-crt="title"] { font-family: var(--crt-font-px); font-weight: 400; font-style: normal; font-stretch: 100%; letter-spacing: 0; word-spacing: -0.12em; color: var(--crt-fg); text-transform: none; position: relative; }
-	h1 { font-size: 40px; line-height: 1.35; color: var(--crt-lime); }
-	h1 em, h1 strong, h2 em, h2 strong { color: inherit; font-weight: inherit; font-style: inherit; }
-	h2 { font-size: 24px; line-height: 1.4; }
-	[data-crt="title"] { font-size: 24px; line-height: 1.4; }
-	@media (max-width: 1100px) { h1 { font-size: 32px; } }
-	@media (max-width: 760px) { h1 { font-size: 24px; } h2, [data-crt="title"] { font-size: 16px; line-height: 1.5; } }
-	h3, h4, h5, h6 { color: var(--crt-fg); font-weight: 600; }
-
-	/* Farbsäume wie bei NTSC-Chroma, aber nur solange das Bild gestört ist oder gescrollt wird. Steht ein Titel
+	/* Farbsäume wie bei NTSC-Chroma an Titeln, aber nur solange das Bild gestört ist oder gescrollt wird. Steht ein Titel
 	   im Bild und ist Ruhe, bekommt er von crt.js die Klasse crt-sharp und rastet in einer halben Sekunde scharf ein.
 	   Eingerastet bleibt ein leichter Versatz, nah am Lesetext, damit Titel und Text nicht auseinanderfallen. */
-	h1, h2, [data-crt="title"] { transition: text-shadow .5s ease; text-shadow: -2px 0 rgba(255, 40, 40, .5), 2px 0 rgba(40, 230, 255, .5); }
+	h1, h2, [data-crt="title"] { position: relative; transition: text-shadow .5s ease; text-shadow: -2px 0 rgba(255, 40, 40, .5), 2px 0 rgba(40, 230, 255, .5); }
 	.crt-sharp { text-shadow: -1px 0 rgba(255, 40, 40, .4), 1px 0 rgba(40, 230, 255, .4); }
 	&[data-crt-scrolling] .crt-sharp { text-shadow: -1.5px 0 rgba(255, 40, 40, .45), 1.5px 0 rgba(40, 230, 255, .45); transition-duration: .15s; }
 	&:not([data-crt="stable"]) .crt-sharp { text-shadow: -2px 0 rgba(255, 40, 40, .5), 2px 0 rgba(40, 230, 255, .5); }
 	/* Zweite, leichte Lage Scanlines auf Titeln. Die globale Lage ist bewusst schwach, damit Lesetext lesbar bleibt. */
 	h1::after, h2::after, [data-crt="title"]::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, .06) 2px 4px); }
 
-	/* Marker in Pixelschrift. font-weight 400 ausdrücklich, sonst synthetisiert der Browser aus einem fetten Elternelement Fettdruck. */
-	[data-crt="marker"] { font-family: var(--crt-font-px); font-weight: 400; font-size: 14px; line-height: 1.6; color: var(--crt-lime); letter-spacing: 0; }
-	[data-crt="muted"] { color: var(--crt-muted); }
-
-	/* Flächen dunkel. hr, wo die Seite eine setzt, als dicke grüne Linie. */
-	hr { border: 0; border-top: 3px solid var(--crt-green); margin: 2rem 0; }
-	header, nav, footer { background: var(--crt-bg); color: var(--crt-fg); backdrop-filter: none; -webkit-backdrop-filter: none; }
-
-	/* Links und Knöpfe. Links Lime, Knöpfe mit dickem Rahmen und ohne Rundung, beim Zeigen invertiert. */
-	a { color: var(--crt-lime); }
-	a:hover { color: var(--crt-fg); }
-	button, [type="button"], [type="submit"], [type="reset"], [data-crt="button"] { display: inline-block; border-radius: 0; border: 3px solid var(--crt-fg); background: #000; color: var(--crt-fg); font-weight: 600; text-decoration: none; cursor: pointer; transition: none; text-shadow: none; box-shadow: none; }
-	button:hover, [type="button"]:hover, [type="submit"]:hover, [type="reset"]:hover, [data-crt="button"]:hover { background: var(--crt-fg); color: #000; transform: none; }
-
-	/* Formular: schwarze Felder, dicker Rahmen, Fokus in Lime. */
-	label { color: var(--crt-lime); }
-	input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]), textarea, select { border: 3px solid var(--crt-line); border-radius: 0; background: #000; color: var(--crt-fg); box-shadow: none; transition: none; }
-	input:focus, textarea:focus, select:focus { background: #000; border-color: var(--crt-lime); box-shadow: none; outline: none; }
-	a:focus-visible, button:focus-visible, summary:focus-visible, [data-crt="button"]:focus-visible { outline: 3px solid var(--crt-lime); outline-offset: 2px; border-radius: 0; }
-
-	/* Code: ein Kasten im Gerätestil. */
-	pre { border: 3px solid var(--crt-line); background: #000; color: var(--crt-fg); text-shadow: none; }
-	code { color: var(--crt-lime); }
-	pre code { color: var(--crt-fg); }
-
-	/* Bilder: gesättigt wie NTSC-Chroma. Mit data-crt="photo" dazu Rahmen und ein Cyan-Rot-Versatz als Farbsaum. */
+	/* Bilder: gesättigt wie NTSC-Chroma. Mit data-crt="photo" dazu eine zweite Lage Scanlines und ein Cyan-Rot-Versatz als Farbsaum. */
 	img, video { filter: saturate(1.4) contrast(1.1); }
-	[data-crt="photo"] { position: relative; display: block; border: 3px solid var(--crt-line); border-radius: 8px; background: #000; overflow: hidden; }
+	[data-crt="photo"] { position: relative; display: block; overflow: hidden; }
 	[data-crt="photo"] img, [data-crt="photo"] video { display: block; width: 100%; filter: saturate(1.5) contrast(1.1); }
 	[data-crt="photo"]::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, .22) 2px 4px), linear-gradient(90deg, rgba(255, 40, 40, .12), transparent 30%, transparent 70%, rgba(40, 230, 255, .14)); }
 
-	/* Hero: Fläche mit Foto, Headline darauf. Das Foto wird gesättigt und von unten abgedunkelt, darüber eine zweite Lage Scanlines. */
-	/* Das Bild bleibt, wie die Seite es legt (absolut oder im Fluss). Der Verlauf liegt darüber (z 0), alle anderen Kinder
+	/* Hero: Fläche mit Foto, Headline darauf. Das Foto wird gesättigt und von unten abgedunkelt, darüber eine zweite Lage Scanlines.
+	   Das Bild bleibt, wie die Seite es legt (absolut oder im Fluss). Der Verlauf liegt darüber (z 0), alle anderen Kinder
 	   darüber (z 1); isolation hält die Stapelung in der Fläche. */
 	[data-crt="hero"] { position: relative; isolation: isolate; background: #000; }
 	[data-crt="hero"] img, [data-crt="hero"] video { filter: saturate(1.6) contrast(1.15) hue-rotate(-6deg); }
 	[data-crt="hero"]::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, .22) 2px 4px), linear-gradient(to top, rgba(0, 0, 0, .88) 0%, rgba(0, 0, 0, .5) 45%, rgba(0, 0, 0, .15) 100%); }
 	[data-crt="hero"] > :not(img):not(video):not(picture) { position: relative; z-index: 1; }
 
-	/* Bildschirm-Overlays, alle klickdurchlässig, alle über dem Inhalt (z 60).
-	   Scanlines und Lochmaske liegen NICHT fest am Schirm, sondern als dokumentgroße Ebene auf dem Inhalt (html::after,
-	   absolut über dem relativ gesetzten html). Grund: iOS Safari zeigt beim Scrollen unter der Statusleiste und beim
-	   Gummiband den Inhalt, verschiebt aber die feste Ebene, dort wäre die Seite nackt. Eine Ebene, die mit dem Inhalt
-	   scrollt, kann iOS nicht vom Inhalt trennen. Schnee, Brummstreifen, Flackern und Wölbung bleiben fest am Schirm und
-	   reichen je einen halben Viewport über den Rand hinaus. */
+	/* Bildschirm-Overlays, alle klickdurchlässig, alle über dem Inhalt (z 60). Nichts davon ist position: fixed:
+	   iOS Safari beschneidet feste Ebenen an der Statusleiste und der Safari-Leiste, dort wäre die Seite nackt und der
+	   Schnee fehlte. Scanlines und Lochmaske liegen als dokumentgroße Ebene auf dem Inhalt (html::after, absolut über dem
+	   relativ gesetzten html). Wölbung, Schnee, Brummstreifen und Flackern liegen in .crt-screen (von crt.js erzeugt),
+	   ebenfalls absolut und dokumentgroß, mit einem Bildschirm darin, der am Viewport klebt und oben und unten 10 vh
+	   darüber hinausreicht, dieselbe Technik wie bei Kanal 3. */
 	position: relative;
 	&::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 60;
 		background:
 			repeating-linear-gradient(90deg, rgba(255, 0, 0, .03) 0 1px, rgba(0, 255, 0, .03) 1px 2px, rgba(0, 0, 255, .03) 2px 3px),
 			repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, .12) 2px 4px);
 	}
-	&::before, body::before, body::after, .crt-flick { content: ""; position: fixed; inset: -50% 0; pointer-events: none; z-index: 60; }
-	/* body::before: Wölbung (Vignette, auf die Schirmgröße in der Mitte des Überstands gesetzt) und Glanz. */
-	body::before {
+	.crt-screen { position: absolute; inset: 0; z-index: 60; pointer-events: none; }
+	.crt-screen-view { position: sticky; top: -10vh; height: 120vh; overflow: hidden; }
+	.crt-screen-view::before, .crt-screen-view::after, .crt-hum, .crt-flick { content: ""; position: absolute; inset: 0; }
+	/* Wölbung (Vignette, auf die Schirmgröße in der Mitte des Überstands gesetzt: 100 von 120 vh) und Glanz. */
+	.crt-screen-view::before {
 		background:
 			linear-gradient(115deg, rgba(255, 255, 255, .07) 0%, rgba(255, 255, 255, 0) 32%),
 			radial-gradient(ellipse 75% 70% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, .5) 90%, rgba(0, 0, 0, .9) 100%);
-		background-size: auto, 100% 50%;
+		background-size: auto, 100% 83.34%;
 		background-position: 0 0, 50% 50%;
 		background-repeat: repeat, no-repeat;
 	}
-	@media (min-width: 721px) { body::before { border-radius: 36px / 48px; } }
-	/* body::after: RF-Schnee, springt im Takt. */
-	body::after {
+	/* RF-Schnee, springt im Takt. */
+	.crt-screen-view::after {
 		background-image: radial-gradient(rgba(255, 255, 255, .75) .6px, transparent 1.2px), radial-gradient(rgba(255, 255, 255, .5) .6px, transparent 1.2px);
 		background-size: 7px 5px, 11px 9px;
 		opacity: .38;
 		animation: crt-snow .18s steps(1) infinite;
 	}
-	/* html::before: Brummstreifen, läuft langsam von oben nach unten. .crt-flick (von crt.js erzeugt): Flackern. */
-	&::before {
+	/* Brummstreifen, läuft langsam von oben nach unten. Flackern. */
+	.crt-hum {
 		bottom: auto; height: 14%; top: -30%;
 		background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .07) 40%, rgba(0, 0, 0, .12) 70%, rgba(255, 255, 255, 0));
 		animation: crt-hum 6s linear infinite;
@@ -178,26 +143,26 @@ html[data-skin="crt"]:not(#_) {
 	/* Gestört: der Inhalt wellt sich. Stabil: nur ein seltener Ruckler. */
 	main { animation: crt-wave 1.3s ease-in-out infinite; }
 	&[data-crt="stable"] {
-		body::after { opacity: .035; transition: opacity .3s ease; }
-		&::before { opacity: .35; }
+		.crt-screen-view::after { opacity: .035; transition: opacity .3s ease; }
+		.crt-hum { opacity: .35; }
 		.crt-flick { animation-duration: 1.1s; }
 		main { animation: crt-jitter 11s linear infinite; }
 	}
 	/* Beim Scrollen kommt der Empfang ins Wanken: mehr Schnee und stärkere Farbsäume auf den Titeln, aber kein Wellen des Inhalts. */
 	&[data-crt="stable"][data-crt-scrolling] {
-		body::after { opacity: .14; }
+		.crt-screen-view::after { opacity: .14; }
 	}
 
-	/* Kanal 2: kein Sender, nur Rauschen. Der Inhalt versinkt im Schnee. */
-	&[data-crt-ch="2"] {
-		body::after { opacity: .92; animation-duration: .08s; }
-		&::before { opacity: 1; animation-duration: 1.4s; }
+	/* Rauschen: kein Sender. Der Inhalt versinkt im Schnee. */
+	&[data-crt-ch="static"] {
+		.crt-screen-view::after { opacity: .92; animation-duration: .08s; }
+		.crt-hum { opacity: 1; animation-duration: 1.4s; }
 		.crt-flick { animation-duration: .25s; }
 		main, header, nav, footer { filter: grayscale(1) contrast(.7) brightness(.45); }
 		main { animation: crt-wave .5s ease-in-out infinite; }
 	}
 
-	/* Kanal 3: eigenes Bild oder Video, liegt über der Seite und unter den Overlays, damit es ebenfalls flimmert.
+	/* Eigenes Bild oder Video, liegt über der Seite und unter den Overlays, damit es ebenfalls flimmert.
 	   Es füllt den ganzen Schirm, Ränder werden beschnitten statt schwarz gelassen.
 	   Die Ebene ist absolut und dokumentgroß wie die Scanlines, nicht fest: iOS beschneidet feste Ebenen an Statusleiste und
 	   Safari-Leiste, eine Ebene im Dokument nicht. Der Bildschirm darin klebt am Viewport und reicht oben und unten 10 vh darüber hinaus.
@@ -208,32 +173,44 @@ html[data-skin="crt"]:not(#_) {
 	.crt-tv-screen::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, .22) 2px 4px); }
 	.crt-tv img, .crt-tv video { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; filter: saturate(1.5) contrast(1.1); }
 
+	/* Sauberer Empfang. Steht das Bild, verschwinden alle Artefakte: Scanlines, Wölbung, Schnee, Brummstreifen, Flackern,
+	   Ruckler, Säume, Schimmer, Sättigung. Ohne data-crt="stable" gelten die Regeln von oben, die Störung nach der Ruhe
+	   sieht also aus wie auf Kanal 1 (crt.js schaltet diesen Kanal ohne Einschaltstörung). Der Kanalknopf bleibt, der ist das Gerät. */
+	&[data-crt-ch="clean"][data-crt="stable"] {
+		background: var(--crt-bg);
+		&::after, .crt-screen { display: none; }
+		main { animation: none; }
+		body, h1, h2, [data-crt="title"], .crt-sharp { text-shadow: none; }
+		h1::after, h2::after, [data-crt="title"]::after, [data-crt="photo"]::after { background: none; }
+		[data-crt="hero"]::after { background: linear-gradient(to top, rgba(0, 0, 0, .88) 0%, rgba(0, 0, 0, .5) 45%, rgba(0, 0, 0, .15) 100%); }
+		img, video, [data-crt="photo"] img, [data-crt="photo"] video, [data-crt="hero"] img, [data-crt="hero"] video { filter: none; }
+	}
+
 	/* Lite: schwache Hardware. Nichts läuft, das Bild steht mit Scanlines und etwas Schnee, Text immer scharf. */
 	&[data-crt-lite] {
-		body::after { animation: none; opacity: .14; }
-		&::before, .crt-flick { display: none; }
+		.crt-screen-view::after { animation: none; opacity: .14; }
+		.crt-hum, .crt-flick { display: none; }
 		main { animation: none !important; }
-		&[data-crt="stable"] body::after { opacity: .05; }
-		&[data-crt-ch="2"] body::after { opacity: .9; }
+		&[data-crt="stable"] .crt-screen-view::after { opacity: .05; }
+		&[data-crt-ch="static"] .crt-screen-view::after { opacity: .9; }
 		body, h1, h2, [data-crt="title"] { text-shadow: none !important; }
 	}
 
-	/* Kanalknopf (CH1 > CH2 > CH3 > CH1), fest oben rechts, über allem, immer grün, groß und mit pulsierendem Glühen,
-	   damit man ihn drückt. Pfeiltasten und Zifferntasten schalten am Rechner ebenfalls (crt.js).
+	/* Kanalknopf, fest oben rechts, über allem, immer grün, groß und mit pulsierendem Glühen, damit man ihn drückt.
+	   Pfeiltasten und Zifferntasten schalten am Rechner ebenfalls (crt.js).
 	   Sitzt bewusst nicht auf dem Raster der Seite: die Anzeige legt der Fernseher aufs Signal, nicht der Sender. */
 	.crt-ui { display: contents; }
-	.crt-ch { position: fixed; top: var(--crt-ch-top); right: var(--crt-ch-right); z-index: 70; margin: 0; padding: 8px 6px; border: 0; background: none; cursor: pointer; font-family: var(--crt-font-px); font-weight: 400; font-size: var(--crt-ch-size); line-height: 1; color: var(--crt-lime); text-shadow: var(--crt-glow); -webkit-tap-highlight-color: transparent; animation: crt-pulse 2.4s ease-in-out infinite; }
-	.crt-ch:hover, .crt-ch:active, .crt-ch:focus { color: var(--crt-lime); background: none; animation-duration: .9s; }
+	.crt-ch { position: fixed; top: var(--crt-ch-top); right: var(--crt-ch-right); z-index: 70; margin: 0; padding: 8px 6px; border: 0; border-radius: 0; background: none; cursor: pointer; touch-action: manipulation; -webkit-user-select: none; user-select: none; font-family: var(--crt-font-px); font-weight: 400; font-size: var(--crt-ch-size); line-height: 1; color: var(--crt-lime); text-shadow: var(--crt-glow); box-shadow: none; -webkit-tap-highlight-color: transparent; animation: crt-pulse 2.4s ease-in-out infinite; }
+	.crt-ch:hover, .crt-ch:active, .crt-ch:focus { color: var(--crt-lime); background: none; transform: none; animation-duration: .9s; }
 	.crt-ch:focus, .crt-ch:focus-visible { outline: none; }
 
 	@media (max-width: 720px) {
-		body::before { border-radius: 0; }
 		.crt-ch { --crt-ch-top: 38px; --crt-ch-right: 30px; --crt-ch-size: 24px; }
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		&::before, .crt-flick, body::after, main, .crt-ch { animation: none !important; }
-		body::after { opacity: .07; }
+		.crt-hum, .crt-flick, .crt-screen-view::after, main, .crt-ch { animation: none !important; }
+		.crt-screen-view::after { opacity: .07; }
 	}
 }
 /* Ohne Skin bleibt die von crt.js erzeugte Bedienung unsichtbar. */

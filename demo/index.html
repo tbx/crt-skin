@@ -7,8 +7,10 @@
 	<meta name="description" content="Two files that turn any website into a picture on an old tube TV. Scanlines, snow, hum bars, colour fringes, a channel button. No build step, no framework, no external requests.">
 	<meta name="theme-color" content="#050507">
 	<link rel="stylesheet" href="demo.css">
-	<!-- Das Skin: zwei Dateien. crt.js im head ohne defer, damit das Attribut vor dem ersten Paint steht. -->
+	<!-- Das Skin: zwei Dateien. crt.js im head ohne defer, damit das Attribut vor dem ersten Paint steht.
+	     crt-look.css ist der optionale Gerätelook, hier aus bis zum Knopf in der Nav. -->
 	<link rel="stylesheet" href="../crt.css">
+	<link rel="stylesheet" href="../crt-look.css" id="look" disabled>
 	<script src="../crt.js" data-ch3="smpte-color-bars.svg" data-ch3-label="Channel 3: SMPTE color bars"></script>
 </head>
 <body>
@@ -20,6 +22,7 @@
 			<a href="#credits">Credits</a>
 			<a href="https://github.com/tbx/crt-skin">GitHub</a>
 			<button type="button" id="toggle" aria-pressed="true">Skin: on</button>
+			<button type="button" id="look-toggle" aria-pressed="false">Look: page</button>
 		</nav>
 	</header>
 
@@ -35,7 +38,7 @@
 
 		<section id="install" class="wrap">
 			<h2>Install</h2>
-			<p>Put <code>crt.css</code>, <code>crt.js</code> and the <code>fonts/</code> folder next to each other. Then add two lines to your page and the attribute to <code>html</code>.</p>
+			<p>Put <code>crt.css</code>, <code>crt.js</code> and the <code>fonts/</code> folder next to each other. Then add two lines to your page and the attribute to <code>html</code>. Your page keeps its fonts, colours and buttons; the skin only puts the TV in front of it.</p>
 			<div class="code">
 				<pre><code id="snippet">&lt;html data-skin="crt"&gt;
   &lt;link rel="stylesheet" href="crt.css"&gt;
@@ -43,6 +46,7 @@
 				<button type="button" id="copy">Copy</button>
 			</div>
 			<p>Leave the attribute out and the skin stays off until someone opens your page with <code>?skin=crt</code>. The choice is remembered, <code>?skin=off</code> clears it. Press the pulsing <strong>CH1</strong> top right, or the arrow keys.</p>
+			<p>Want the device look too, pixel font for headings, lime links, thick frames? Add <code>crt-look.css</code> after <code>crt.css</code>. The <strong>Look</strong> button in the top bar switches it on here.</p>
 		</section>
 
 		<section id="states" class="wrap">
@@ -50,7 +54,7 @@
 			<ul class="states">
 				<li><span data-crt="marker">A</span><div><h3>Power on</h3><p>The picture comes in disturbed: snow, hum bar, the content waves. After three seconds it settles. Headings snap into focus as they enter the screen.</p></div></li>
 				<li><span data-crt="marker">B</span><div><h3>Reception</h3><p>Leave the page alone for ten seconds and the signal drifts for four. Any touch, key or scroll brings it back. While you scroll, the colour fringes on the headings widen.</p></div></li>
-				<li><span data-crt="marker">C</span><div><h3>Channels</h3><p>CH1 is your page. CH2 is static, every click returns. CH3 shows an image or video of your choice, off unless you set one. Keys 1 to 3 and the arrow keys switch too.</p></div></li>
+				<li><span data-crt="marker">C</span><div><h3>Channels</h3><p>CH1 is your page. CH2 is static, every click returns. CH3 shows an image or video of your choice, off unless you set one. The last channel is your page with clean reception: no artifacts at all, only the occasional drift. Keys 1 to 4 and the arrow keys switch too.</p></div></li>
 				<li><span data-crt="marker">D</span><div><h3>Weak hardware</h3><p>Reduced motion, data saver, little memory or a frame test under 45 fps switch to a lite mode: scanlines and vignette stay, nothing animates, text stays sharp.</p></div></li>
 			</ul>
 		</section>
@@ -60,11 +64,11 @@
 			<h2>Hooks</h2>
 			<p>The skin works on plain elements. A few optional attributes give it more to work with:</p>
 			<table>
-				<tr><td><code>data-crt="hero"</code></td><td>A section with a photo: saturated like NTSC chroma, darkened from below.</td></tr>
-				<tr><td><code>data-crt="photo"</code></td><td>A figure with a frame and colour fringe.</td></tr>
-				<tr><td><code>data-crt="title"</code></td><td>Any element in the heading style, for example a quote.</td></tr>
-				<tr><td><code>data-crt="marker"</code></td><td>Small pixel labels like A, B, C.</td></tr>
-				<tr><td><code>data-crt="button"</code></td><td>A link that looks like a button.</td></tr>
+				<tr><td><code>data-crt="hero"</code></td><td>A section with a photo: saturated like NTSC chroma, darkened from below, a second layer of scanlines.</td></tr>
+				<tr><td><code>data-crt="photo"</code></td><td>A figure with a second layer of scanlines and a colour fringe.</td></tr>
+				<tr><td><code>data-crt="title"</code></td><td>Any element that snaps into focus like a heading, for example a quote.</td></tr>
+				<tr><td><code>data-crt="marker"</code></td><td>Small pixel labels like A, B, C (with <code>crt-look.css</code>).</td></tr>
+				<tr><td><code>data-crt="button"</code></td><td>A link that looks like a button (with <code>crt-look.css</code>).</td></tr>
 			</table>
 		</section>
 
@@ -92,6 +96,15 @@
 			};
 			toggle.addEventListener('click', function () { window.crtSkin.toggle(); paint(); });
 			paint();
+
+			/* Gerätelook: das zweite Stylesheet an- und abschalten. */
+			var look = document.getElementById('look');
+			var lookToggle = document.getElementById('look-toggle');
+			lookToggle.addEventListener('click', function () {
+				look.disabled = !look.disabled;
+				lookToggle.textContent = 'Look: ' + (look.disabled ? 'page' : 'device');
+				lookToggle.setAttribute('aria-pressed', String(!look.disabled));
+			});
 
 			var copy = document.getElementById('copy');
 			copy.addEventListener('click', function () {

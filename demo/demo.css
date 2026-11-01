@@ -1,9 +1,13 @@
-/* Demo-Seite: eine schlichte, helle Seite ohne eigene Idee. Mit Skin aus sieht man, was das Skin tut. */
+/* Demo-Seite: eine schlichte Seite ohne eigene Idee, hell. Mit Skin wird sie dunkel, wie der Dark Mode
+   einer echten Seite: die Farben hängen an Variablen, die unter html[data-skin="crt"] umspringen.
+   Mit Skin aus sieht man, was das Skin tut. */
 * { box-sizing: border-box; }
-html { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 18px; line-height: 1.55; color: #1a1a1a; background: #fff; }
+html { --bg: #fff; --fg: #1a1a1a; --soft: #f3f3f3; --line: #ddd; --link: #0a58ca; --muted: #888; }
+html[data-skin="crt"] { --bg: #101010; --fg: #f3f1ee; --soft: #1a1a1a; --line: #2a2a2a; --link: #8ec5ff; --muted: #9d9995; }
+html { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 18px; line-height: 1.55; color: var(--fg); background: var(--bg); }
 body { margin: 0; }
 .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
-header { position: sticky; top: 0; background: #fff; z-index: 10; }
+header { position: sticky; top: 0; background: var(--bg); z-index: 10; }
 nav.wrap { display: flex; align-items: center; gap: 24px; height: 64px; padding-right: 150px; }
 nav a { color: inherit; text-decoration: none; font-weight: 600; }
 nav .brand { margin-right: auto; }
@@ -14,26 +18,27 @@ h2 { font-size: 32px; margin: 0 0 .8em; }
 h3 { font-size: 20px; margin: 0 0 .35em; }
 p { margin: 0 0 1em; }
 section.wrap { padding: 72px 24px; }
-a { color: #0a58ca; }
-button, [data-crt="button"] { display: inline-block; font: inherit; font-weight: 600; padding: 10px 18px; border: 1px solid #1a1a1a; border-radius: 8px; background: #1a1a1a; color: #fff; cursor: pointer; text-decoration: none; }
-button:hover, [data-crt="button"]:hover { background: #333; }
+a { color: var(--link); }
+button, [data-crt="button"] { display: inline-block; font: inherit; font-weight: 600; padding: 10px 18px; border: 1px solid var(--fg); border-radius: 8px; background: var(--fg); color: var(--bg); cursor: pointer; text-decoration: none; }
+button:hover, [data-crt="button"]:hover { opacity: .85; }
+nav button { padding: 6px 12px; font-size: 14px; }
 
 .hero { padding: 0; position: relative; min-height: 70vh; display: flex; align-items: flex-end; background: #000; }
 .hero > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hero .wrap { position: relative; width: 100%; padding-top: 96px; padding-bottom: 72px; color: #fff; }
 .hero .lede { font-size: 22px; max-width: 44ch; }
 .hero a { color: #fff; }
+.hero [data-crt="button"] { border-color: #fff; background: #fff; color: #000; }
 
 .code { position: relative; margin: 24px 0; }
-pre { margin: 0; padding: 20px 110px 20px 20px; background: #f3f3f3; border: 1px solid #ddd; border-radius: 8px; overflow-x: auto; font-size: 15px; line-height: 1.5; }
+pre { margin: 0; padding: 20px 110px 20px 20px; background: var(--soft); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; font-size: 15px; line-height: 1.5; }
 code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .95em; }
 .code button { position: absolute; top: 12px; right: 12px; padding: 6px 12px; font-size: 14px; }
 
 .states { list-style: none; margin: 0; padding: 0; }
 .states li { display: flex; gap: 20px; padding: 16px 0; }
-.states span { flex: 0 0 2.5em; font-weight: 700; color: #888; padding-top: 2px; }
+.states span { flex: 0 0 2.5em; font-weight: 700; color: var(--muted); padding-top: 2px; }
 .states p { margin: 0; }
-
 
 table { border-collapse: collapse; width: 100%; }
 td { padding: 8px 16px 8px 0; vertical-align: top; }
@@ -42,11 +47,11 @@ td:first-child { white-space: nowrap; }
 footer.wrap { padding: 72px 24px 112px; font-size: 20px; }
 footer ul { list-style: none; margin: 0; padding: 0; }
 footer li { display: flex; gap: 20px; padding: 14px 0; }
-footer li span { flex: 0 0 2.5em; font-weight: 700; color: #888; padding-top: 2px; }
+footer li span { flex: 0 0 2.5em; font-weight: 700; color: var(--muted); padding-top: 2px; }
 
 @media (max-width: 760px) {
 	html { font-size: 16px; }
-	nav.wrap { gap: 14px; padding-right: 90px; }
+	nav.wrap { gap: 10px; padding-right: 90px; }
 	nav a:not(.brand) { display: none; }
 	h1 { font-size: 32px; }
 	h2 { font-size: 24px; }
