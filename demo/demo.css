@@ -10,17 +10,17 @@ nav .brand { margin-right: auto; }
 nav button { margin-left: 8px; }
 h1, h2, h3 { line-height: 1.2; margin: 0 0 .6em; }
 h1 { font-size: 48px; max-width: 22ch; }
-h2 { font-size: 32px; margin-top: 0; }
-h3 { font-size: 20px; margin-bottom: .3em; }
+h2 { font-size: 32px; margin: 0 0 .8em; }
+h3 { font-size: 20px; margin: 0 0 .35em; }
 p { margin: 0 0 1em; }
-section { padding: 64px 0; }
+section.wrap { padding: 72px 24px; }
 a { color: #0a58ca; }
 button, [data-crt="button"] { display: inline-block; font: inherit; font-weight: 600; padding: 10px 18px; border: 1px solid #1a1a1a; border-radius: 8px; background: #1a1a1a; color: #fff; cursor: pointer; text-decoration: none; }
 button:hover, [data-crt="button"]:hover { background: #333; }
 
 .hero { padding: 0; position: relative; min-height: 70vh; display: flex; align-items: flex-end; background: #000; }
 .hero > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.hero .wrap { position: relative; width: 100%; padding-top: 80px; padding-bottom: 64px; color: #fff; }
+.hero .wrap { position: relative; width: 100%; padding-top: 96px; padding-bottom: 72px; color: #fff; }
 .hero .lede { font-size: 22px; max-width: 44ch; }
 .hero a { color: #fff; }
 
@@ -34,16 +34,12 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 .states span { flex: 0 0 2.5em; font-weight: 700; color: #888; padding-top: 2px; }
 .states p { margin: 0; }
 
-.two { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
-figure { margin: 0; border-radius: 8px; overflow: hidden; }
-figure img { display: block; width: 100%; height: auto; }
-blockquote { margin: 0 0 1em; font-size: 24px; font-weight: 600; line-height: 1.35; }
 
 table { border-collapse: collapse; width: 100%; }
 td { padding: 8px 16px 8px 0; vertical-align: top; }
 td:first-child { white-space: nowrap; }
 
-footer { padding: 64px 24px 96px; font-size: 20px; }
+footer.wrap { padding: 72px 24px 112px; font-size: 20px; }
 footer ul { list-style: none; margin: 0; padding: 0; }
 footer li { display: flex; gap: 20px; padding: 14px 0; }
 footer li span { flex: 0 0 2.5em; font-weight: 700; color: #888; padding-top: 2px; }
@@ -54,8 +50,8 @@ footer li span { flex: 0 0 2.5em; font-weight: 700; color: #888; padding-top: 2p
 	nav a:not(.brand) { display: none; }
 	h1 { font-size: 32px; }
 	h2 { font-size: 24px; }
-	section { padding: 40px 0; }
-	.two { grid-template-columns: 1fr; }
+	section.wrap { padding: 48px 24px; }
+	footer.wrap { padding: 48px 24px 80px; }
 	pre { padding-right: 20px; }
 	.code button { position: static; margin-top: 8px; }
 }
