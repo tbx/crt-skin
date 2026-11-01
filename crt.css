@@ -117,14 +117,13 @@ html[data-skin="crt"]:not(#_) {
 	.crt-screen { position: absolute; inset: 0; z-index: 60; pointer-events: none; }
 	.crt-screen-view { position: sticky; top: -10vh; height: 120vh; overflow: hidden; }
 	.crt-screen-view::before, .crt-screen-view::after, .crt-hum, .crt-flick { content: ""; position: absolute; inset: 0; }
-	/* Wölbung (Vignette, auf die Schirmgröße in der Mitte des Überstands gesetzt: 100 von 120 vh) und Glanz. */
+	/* Wölbung (Vignette) und Glanz. Die Vignette füllt den ganzen Bildschirm samt Überstand, nicht nur die Schirmgröße in
+	   der Mitte: am Anfang und am Ende der Seite steht der Bildschirm nicht mittig, dann wäre ihre Kante zu sehen. Die
+	   Ellipse ist dafür etwas flacher (58 von 120 vh entsprechen 70 vh Schirm). */
 	.crt-screen-view::before {
 		background:
 			linear-gradient(115deg, rgba(255, 255, 255, .07) 0%, rgba(255, 255, 255, 0) 32%),
-			radial-gradient(ellipse 75% 70% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, .5) 90%, rgba(0, 0, 0, .9) 100%);
-		background-size: auto, 100% 83.34%;
-		background-position: 0 0, 50% 50%;
-		background-repeat: repeat, no-repeat;
+			radial-gradient(ellipse 75% 58% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, .5) 90%, rgba(0, 0, 0, .9) 100%);
 	}
 	/* RF-Schnee, springt im Takt. */
 	.crt-screen-view::after {
