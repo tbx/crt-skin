@@ -33,8 +33,9 @@
                             Keine Einschaltstörung, nur die Störung nach der Ruhe.
    - data-crt-lite          schwache Hardware: keine laufenden Animationen, Scanlines und Vignette bleiben.
 
-   Die Wellen laufen auf main. Nicht auf body: ein transform auf body würde die Ebenen
-   mitnehmen. Seiten ohne main bekommen keine Wellen, alles andere läuft trotzdem.
+   Die Wellen laufen auf main und auf einem header direkt in body (ein Header außerhalb von
+   main stünde sonst still, während die Seite wackelt). Nicht auf body: ein transform auf body
+   würde die Ebenen mitnehmen. Seiten ohne main bekommen keine Wellen, alles andere läuft trotzdem.
 
    Anpassen über Custom Properties auf html[data-skin="crt"], zum Beispiel die Lage des Kanalknopfs:
      html[data-skin="crt"] { --crt-ch-top: 20px; --crt-ch-right: 20px; } */
@@ -139,13 +140,13 @@ html[data-skin="crt"]:not(#_) {
 		animation: crt-hum 6s linear infinite;
 	}
 	.crt-flick { background: #000; opacity: 0; animation: crt-flick .5s steps(2) infinite; }
-	/* Gestört: der Inhalt wellt sich. Stabil: nur ein seltener Ruckler. */
-	main { animation: crt-wave 1.3s ease-in-out infinite; }
+	/* Gestört: der Inhalt wellt sich, ein Header außerhalb von main mit. Stabil: nur ein seltener Ruckler. */
+	main, body > header { animation: crt-wave 1.3s ease-in-out infinite; }
 	&[data-crt="stable"] {
 		.crt-screen-view::after { opacity: .035; transition: opacity .3s ease; }
 		.crt-hum { opacity: .35; }
 		.crt-flick { animation-duration: 1.1s; }
-		main { animation: crt-jitter 11s linear infinite; }
+		main, body > header { animation: crt-jitter 11s linear infinite; }
 	}
 	/* Beim Scrollen kommt der Empfang ins Wanken: mehr Schnee und stärkere Farbsäume auf den Titeln, aber kein Wellen des Inhalts. */
 	&[data-crt="stable"][data-crt-scrolling] {
@@ -158,7 +159,7 @@ html[data-skin="crt"]:not(#_) {
 		.crt-hum { opacity: 1; animation-duration: 1.4s; }
 		.crt-flick { animation-duration: .25s; }
 		main, header, nav, footer { filter: grayscale(1) contrast(.7) brightness(.45); }
-		main { animation: crt-wave .5s ease-in-out infinite; }
+		main, body > header { animation: crt-wave .5s ease-in-out infinite; }
 	}
 
 	/* Eigenes Bild oder Video, liegt über der Seite und unter den Overlays, damit es ebenfalls flimmert.
@@ -178,7 +179,7 @@ html[data-skin="crt"]:not(#_) {
 	&[data-crt-ch="clean"][data-crt="stable"] {
 		background: var(--crt-bg);
 		&::after, .crt-screen { display: none; }
-		main { animation: none; }
+		main, body > header { animation: none; }
 		body, h1, h2, [data-crt="title"], .crt-sharp { text-shadow: none; }
 		h1::after, h2::after, [data-crt="title"]::after, [data-crt="photo"]::after { background: none; }
 		[data-crt="hero"]::after { background: linear-gradient(to top, rgba(0, 0, 0, .88) 0%, rgba(0, 0, 0, .5) 45%, rgba(0, 0, 0, .15) 100%); }
@@ -189,7 +190,7 @@ html[data-skin="crt"]:not(#_) {
 	&[data-crt-lite] {
 		.crt-screen-view::after { animation: none; opacity: .14; }
 		.crt-hum, .crt-flick { display: none; }
-		main { animation: none !important; }
+		main, body > header { animation: none !important; }
 		&[data-crt="stable"] .crt-screen-view::after { opacity: .05; }
 		&[data-crt-ch="static"] .crt-screen-view::after { opacity: .9; }
 		body, h1, h2, [data-crt="title"] { text-shadow: none !important; }
@@ -208,7 +209,7 @@ html[data-skin="crt"]:not(#_) {
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.crt-hum, .crt-flick, .crt-screen-view::after, main, .crt-ch { animation: none !important; }
+		.crt-hum, .crt-flick, .crt-screen-view::after, main, body > header, .crt-ch { animation: none !important; }
 		.crt-screen-view::after { opacity: .07; }
 	}
 }

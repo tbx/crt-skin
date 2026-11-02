@@ -22,13 +22,13 @@ Load the script in the `<head>` without `defer`. It is small, and that way the a
 
 Leave `data-skin="crt"` out and the skin stays off until a visitor opens the page with `?skin=crt`. The choice is remembered in `localStorage`, `?skin=off` clears it. Both work whether the attribute is in your HTML or not.
 
-The content that should wave during interference needs to sit inside a `<main>` element. Everything else works on any markup.
+The content that should wave during interference needs to sit inside a `<main>` element; a `<header>` directly in `<body>` waves along. Everything else works on any markup.
 
 ## What it does
 
-- **Power on.** The picture comes in disturbed: snow, hum bar, the content waves. After three seconds it settles. Headings carry colour fringes and snap into focus as they enter the screen.
+- **Power on.** The picture comes in disturbed: snow, hum bar, the content waves. After three seconds it settles; the first two of them no touch can cut short. Headings carry colour fringes and snap into focus as they enter the screen.
 - **Reception.** Leave the page alone for ten seconds and the signal drifts for four. Any touch, key, scroll or mouse move brings it back. On Android a shake counts too. While you scroll, the fringes widen.
-- **Channels.** The pulsing `CH1` top right switches channels. CH1 is your page. CH2 is static, every click returns, after ten seconds it returns by itself. CH3 shows an image or video of your choice and is off unless you set one. The last channel is your page with clean reception: no artifacts at all, only the occasional drift after ten quiet seconds. Number keys and the arrow keys switch too.
+- **Channels.** The pulsing `CH1` top right switches channels. CH1 is your page. CH2 is static, every click returns, after ten seconds it returns by itself. CH3 shows an image or video of your choice and is off unless you set one. The last channel is your page with clean reception: no artifacts at all, only the occasional drift after ten quiet seconds. Back on CH1 the page starts at the top with a one second burst of noise. Number keys and the arrow keys switch too.
 - **Weak hardware.** Reduced motion, data saver, little memory, few cores, or a short frame test under about 45 fps after load switch to a lite mode: scanlines and vignette stay, nothing animates, text stays sharp. The result is kept for the session. `?crt=lite` forces it, `?crt=full` turns it off.
 
 ## Your page stays your page

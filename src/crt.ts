@@ -10,9 +10,10 @@
    nach dem Laden, ob der Browser die Overlays flüssig schafft. Das Ergebnis bleibt für die Sitzung
    (sessionStorage "crt-lite"). ?crt=lite erzwingt den Modus, ?crt=full schaltet ihn ab.
 
-   Störung: beim Einschalten gestört, nach 3 s steht das Bild. Nach 10 s ohne Tippen, Scrollen,
-   Mausbewegung oder Taste kommt die Störung für 4 s zurück, dann wieder Ruhe und von vorn; die
-   nächste Berührung beendet sie sofort. Auf Android zählt Schütteln ebenfalls (iOS fragt für den
+   Störung: beim Einschalten gestört, nach 3 s steht das Bild, die ersten 2 s davon bricht auch
+   keine Berührung ab. Nach 10 s ohne Tippen, Scrollen, Mausbewegung oder Taste kommt die Störung
+   für 4 s zurück, dann wieder Ruhe und von vorn; die nächste Berührung beendet sie sofort.
+   Zurück auf CH1 nur 1 s Störung, und die Seite beginnt oben. Auf Android zählt Schütteln ebenfalls (iOS fragt für den
    Sensor per Dialog nach, das lassen wir bewusst weg).
 
    Einrasten: h1, h2 und Elemente mit data-crt="title" tragen Farbsäume, solange das Bild gestört
@@ -96,7 +97,7 @@ const probeLite = () => {
 
 /* ---------- Laufzeit, einmal aufgebaut, läuft nur mit Skin ---------- */
 let built = false;
-let powerOn = () => {};
+let powerOn = (_noise?: number, _hold?: number) => {};
 let setCh = (_n: number) => {};
 let ch = 1;
 const isOn = () => html.dataset.skin === 'crt';
@@ -159,20 +160,26 @@ const build = () => {
 	const isPage = (n: number) => kinds[n - 1] === 'page' || kinds[n - 1] === 'clean';
 
 	/* ---------- Störung ---------- */
-	/* Nach 10 s Ruhe stört es für 4 s, dann steht das Bild wieder, und der Zähler läuft von vorn. Jede Berührung beendet die Störung sofort. */
-	const STABLE_AFTER = 3000, IDLE_AFTER = 10000, IDLE_NOISE = 4000;
+	/* Nach 10 s Ruhe stört es für 4 s, dann steht das Bild wieder, und der Zähler läuft von vorn. Jede Berührung beendet die Störung sofort.
+	   Einschaltstörung 3 s, davon die ersten 2 s unabhängig von Maus, Scrollen oder Taste. Zurück auf CH1 nur 1 s. */
+	const STABLE_AFTER = 3000, MIN_NOISE = 2000, BACK_NOISE = 1000, IDLE_AFTER = 10000, IDLE_NOISE = 4000;
+	let holdUntil = 0;
 	let idle: number | undefined, calm: number | undefined, warm: number | undefined;
 	const setStable = (on: boolean) => { if (on) html.setAttribute('data-crt', 'stable'); else html.removeAttribute('data-crt'); };
 	const armIdle = () => {
 		clearTimeout(idle); clearTimeout(calm);
 		idle = window.setTimeout(() => { setStable(false); calm = window.setTimeout(activity, IDLE_NOISE); }, IDLE_AFTER);
 	};
-	const activity = () => { if (!isOn()) return; setStable(true); armIdle(); };
-	/* Einschalten: erst gestört, nach 3 s steht das Bild. Beim Laden und bei jeder Rückkehr auf CH1. */
+	const activity = () => { if (!isOn()) return; if (Date.now() < holdUntil) { armIdle(); return; } setStable(true); armIdle(); };
+	/* Einschalten: erst gestört, nach `noise` ms steht das Bild, und die ersten `hold` ms bricht auch keine Berührung ab. Beim Laden und bei der Rückkehr auf CH1. */
 	let clean = () => {};
-	powerOn = () => { setStable(false); clearTimeout(idle); clearTimeout(calm); clearTimeout(warm); warm = window.setTimeout(activity, STABLE_AFTER); };
+	powerOn = (noise = STABLE_AFTER, hold = MIN_NOISE) => {
+		setStable(false); holdUntil = Date.now() + hold;
+		clearTimeout(idle); clearTimeout(calm); clearTimeout(warm);
+		warm = window.setTimeout(() => { holdUntil = 0; activity(); }, noise);
+	};
 	/* Sauberer Kanal: steht sofort, nur der Zähler für die Störung nach der Ruhe läuft. */
-	clean = () => { clearTimeout(warm); activity(); };
+	clean = () => { clearTimeout(warm); holdUntil = 0; activity(); };
 	let lastMove = 0;
 	const onMove = () => { const t = Date.now(); if (t - lastMove > 400) { lastMove = t; activity(); } };
 	['pointerdown', 'touchstart', 'keydown', 'wheel'].forEach((e) => addEventListener(e, activity, { passive: true, capture: true }));
@@ -232,8 +239,9 @@ const build = () => {
 				if (media instanceof HTMLVideoElement) media.pause();
 			}
 		}
-		/* Zurück auf CH1: der Sender kommt wie beim ersten Besuch erst nach kurzer Störung rein. Der saubere Kanal steht sofort. */
-		if (kind === 'page' && from !== 1) powerOn();
+		/* Zurück auf CH1 kommt der Sender mit einer kurzen Störung von 1 s rein, und die Seite beginnt oben wie nach dem
+		   Einschalten. Der saubere Kanal steht sofort. */
+		if (kind === 'page' && from !== 1) { powerOn(BACK_NOISE, BACK_NOISE); window.scrollTo({ top: 0, behavior: 'auto' }); }
 		else if (kind === 'clean') clean();
 	};
 	const next = () => setCh(ch === channels ? 1 : ch + 1);

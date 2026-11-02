@@ -12,9 +12,10 @@
      nach dem Laden, ob der Browser die Overlays flüssig schafft. Das Ergebnis bleibt für die Sitzung
      (sessionStorage "crt-lite"). ?crt=lite erzwingt den Modus, ?crt=full schaltet ihn ab.
   
-     Störung: beim Einschalten gestört, nach 3 s steht das Bild. Nach 10 s ohne Tippen, Scrollen,
-     Mausbewegung oder Taste kommt die Störung für 4 s zurück, dann wieder Ruhe und von vorn; die
-     nächste Berührung beendet sie sofort. Auf Android zählt Schütteln ebenfalls (iOS fragt für den
+     Störung: beim Einschalten gestört, nach 3 s steht das Bild, die ersten 2 s davon bricht auch
+     keine Berührung ab. Nach 10 s ohne Tippen, Scrollen, Mausbewegung oder Taste kommt die Störung
+     für 4 s zurück, dann wieder Ruhe und von vorn; die nächste Berührung beendet sie sofort.
+     Zurück auf CH1 nur 1 s Störung, und die Seite beginnt oben. Auf Android zählt Schütteln ebenfalls (iOS fragt für den
      Sensor per Dialog nach, das lassen wir bewusst weg).
   
      Einrasten: h1, h2 und Elemente mit data-crt="title" tragen Farbsäume, solange das Bild gestört
@@ -115,7 +116,7 @@
     else addEventListener("load", () => setTimeout(probe, 300), { once: true });
   };
   var built = false;
-  var powerOn = () => {
+  var powerOn = (_noise, _hold) => {
   };
   var setCh = (_n) => {
   };
@@ -175,7 +176,8 @@
     const kinds = ["page", "static", ...tv ? ["media"] : [], "clean"];
     const channels = kinds.length;
     const isPage = (n) => kinds[n - 1] === "page" || kinds[n - 1] === "clean";
-    const STABLE_AFTER = 3e3, IDLE_AFTER = 1e4, IDLE_NOISE = 4e3;
+    const STABLE_AFTER = 3e3, MIN_NOISE = 2e3, BACK_NOISE = 1e3, IDLE_AFTER = 1e4, IDLE_NOISE = 4e3;
+    let holdUntil = 0;
     let idle, calm, warm;
     const setStable = (on) => {
       if (on) html.setAttribute("data-crt", "stable");
@@ -191,20 +193,29 @@
     };
     const activity = () => {
       if (!isOn()) return;
+      if (Date.now() < holdUntil) {
+        armIdle();
+        return;
+      }
       setStable(true);
       armIdle();
     };
     let clean = () => {
     };
-    powerOn = () => {
+    powerOn = (noise = STABLE_AFTER, hold = MIN_NOISE) => {
       setStable(false);
+      holdUntil = Date.now() + hold;
       clearTimeout(idle);
       clearTimeout(calm);
       clearTimeout(warm);
-      warm = window.setTimeout(activity, STABLE_AFTER);
+      warm = window.setTimeout(() => {
+        holdUntil = 0;
+        activity();
+      }, noise);
     };
     clean = () => {
       clearTimeout(warm);
+      holdUntil = 0;
       activity();
     };
     let lastMove = 0;
@@ -272,8 +283,10 @@
           if (media instanceof HTMLVideoElement) media.pause();
         }
       }
-      if (kind === "page" && from !== 1) powerOn();
-      else if (kind === "clean") clean();
+      if (kind === "page" && from !== 1) {
+        powerOn(BACK_NOISE, BACK_NOISE);
+        window.scrollTo({ top: 0, behavior: "auto" });
+      } else if (kind === "clean") clean();
     };
     const next = () => setCh(ch === channels ? 1 : ch + 1);
     const prev = () => setCh(ch === 1 ? channels : ch - 1);
